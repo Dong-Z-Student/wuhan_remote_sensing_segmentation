@@ -1,0 +1,61 @@
+experiment:
+  name: kmeans_full_features_ignore_snow
+  method: kmeans
+
+data:
+  train_list: data/wuhan/splits/train.txt
+  test_list: data/wuhan/splits/test.txt
+  num_classes: 8
+  ignore_label_values: [8]
+
+features:
+  feature_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+
+  # Band 15: label
+  label_index: 14
+
+  feature_names:
+    - S1_VV
+    - S1_VH
+    - S1_VV_minus_VH_db
+    - S1_NDPI
+    - S1_RVI
+    - S2_B2
+    - S2_B3
+    - S2_B4
+    - S2_B8
+    - S2_B11
+    - S2_B12
+    - NDVI
+    - NDWI
+    - NDBI
+
+sampling:
+  # 从 train.txt 中随机采样非 snow 像元
+  num_train_pixels: 400000
+  seed: 42
+
+preprocess:
+  standardize: true
+
+model:
+  type: MiniBatchKMeans
+  n_clusters: 8
+  batch_size: 8192
+  max_iter: 300
+  n_init: 10
+  random_state: 42
+  reassignment_ratio: 0.01
+  verbose: 0
+
+mapping:
+  # 用训练采样数据建立 cluster -> class 映射
+  method: hungarian
+  build_on: train_sample
+
+evaluation:
+  split: test
+  evaluate_all_pixels: true
+
+output:
+  dir: outputs/kmeans/full_features_ignore_snow

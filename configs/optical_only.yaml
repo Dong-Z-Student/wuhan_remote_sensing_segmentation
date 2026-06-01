@@ -1,0 +1,48 @@
+experiment:
+  name: optical_only
+  mode: optical
+  model: optical_unet
+
+data:
+  train_list: data/wuhan/splits/train.txt
+  val_list: data/wuhan/splits/val.txt
+  test_list: data/wuhan/splits/test.txt
+  num_classes: 8
+  patch_size: 256
+  ignore_index: 255
+  ignore_label_values: [8]
+
+bands:
+  optical_indices: [5, 6, 7, 8, 9, 10]
+  label_index: 14
+
+model:
+  in_channels: 6
+  num_classes: 8
+  base_channels: 32
+  bilinear: true
+
+loss:
+  name: cross_entropy
+  use_class_weight: true
+
+  class_weight_source: data/wuhan/meta/split_class_distribution.csv
+
+  class_weight_method: inverse_sqrt
+
+  normalize_class_weight: true
+
+  min_weight: 0.25
+  max_weight: 5.0
+
+train:
+  batch_size: 16
+  epochs: 30
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  num_workers: 0
+  seed: 42
+  use_class_weight: false
+
+output:
+  dir: outputs/ablation/optical_only_bs16_ignore_snow_weighted
